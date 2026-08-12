@@ -1,0 +1,12 @@
+[
+  { "id": "s1", "name": "恋爱循环", "artist": "花泽香菜", "note": "经典萌曲" },
+  { "id": "s2", "name": "千本樱", "artist": "初音未来", "note": "高音慎点" },
+  { "id": "s3", "name": "神的随波逐流", "artist": "初音未来", "note": "" },
+  { "id": "s4", "name": "白金迪斯科", "artist": "井口裕香", "note": "复古上头" },
+  { "id": "s5", "name": "红莲华", "artist": "LiSA", "note": "燃曲担当" },
+  { "id": "s6", "name": "小幸运", "artist": "田馥甄", "note": "温柔向" },
+  { "id": "s7", "name": "告白气球", "artist": "周杰伦", "note": "" },
+  { "id": "s8", "name": "起风了", "artist": "买辣椒也用券", "note": "民谣风" },
+  { "id": "s9", "name": "病名为爱", "artist": "Neru / 镜音双子", "note": "高难度慎点" },
+  { "id": "s10", "name": "宝贝", "artist": "张悬", "note": "安可曲" }
+]

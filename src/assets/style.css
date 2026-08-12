@@ -1,0 +1,220 @@
+/* 全局样式：二次元粉色/淡紫可爱风，浅色壁纸背景 + 圆角卡片 + 大标题字 */
+
+:root {
+  --pink: #ff8fb8;
+  --pink-deep: #f06292;
+  --pink-light: #ffd6e7;
+  --purple: #c9a7eb;
+  --purple-light: #efe4fb;
+  --ink: #5a4a5e;
+  --ink-light: #9a86a0;
+  --card-bg: rgba(255, 255, 255, 0.88);
+  --radius: 18px;
+  --shadow: 0 6px 24px rgba(240, 98, 146, 0.15);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html,
+body {
+  min-height: 100%;
+}
+
+body {
+  font-family: 'PingFang SC', 'Microsoft YaHei', 'Hiragino Sans GB', sans-serif;
+  color: var(--ink);
+  background: linear-gradient(160deg, #fff0f6 0%, #f6efff 55%, #ffeef7 100%);
+}
+
+/* 整幅壁纸背景（设置了 wallpaper 时叠加在渐变之上） */
+.wallpaper {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background-size: cover;
+  background-position: center;
+  opacity: 0.55;
+  pointer-events: none;
+}
+
+img {
+  max-width: 100%;
+}
+
+a {
+  color: var(--pink-deep);
+  text-decoration: none;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+  border: none;
+  border-radius: 999px;
+  padding: 8px 20px;
+  font-size: 14px;
+  background: linear-gradient(120deg, var(--pink), var(--purple));
+  color: #fff;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(240, 98, 146, 0.35);
+}
+
+button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+button.plain {
+  background: #fff;
+  color: var(--pink-deep);
+  border: 1px solid var(--pink-light);
+}
+
+button.danger {
+  background: #fff;
+  color: #e0506e;
+  border: 1px solid #f5c2cf;
+}
+
+input,
+textarea,
+select {
+  font-family: inherit;
+  font-size: 14px;
+  color: var(--ink);
+  border: 1px solid var(--pink-light);
+  border-radius: 12px;
+  padding: 8px 12px;
+  background: #fff;
+  outline: none;
+  width: 100%;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  border-color: var(--pink);
+  box-shadow: 0 0 0 3px rgba(255, 143, 184, 0.2);
+}
+
+.site-main {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 20px 16px 48px;
+  min-height: 60vh;
+}
+
+.admin-main {
+  min-height: 100vh;
+}
+
+.card {
+  background: var(--card-bg);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 22px;
+  backdrop-filter: blur(4px);
+}
+
+.page-title {
+  font-size: 34px;
+  font-weight: 800;
+  text-align: center;
+  margin: 18px 0 6px;
+  background: linear-gradient(120deg, var(--pink-deep), var(--purple));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.page-subtitle {
+  text-align: center;
+  color: var(--ink-light);
+  margin-bottom: 22px;
+  font-size: 15px;
+}
+
+.tag {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  background: var(--purple-light);
+  color: #7a5aa8;
+}
+
+.load-error {
+  max-width: 1080px;
+  margin: 12px auto 0;
+  padding: 10px 16px;
+  border-radius: 12px;
+  background: #fff2f4;
+  color: #c0475f;
+  font-size: 14px;
+}
+
+/* ── 通用表格 ── */
+.table-wrap {
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+th,
+td {
+  padding: 10px 12px;
+  text-align: left;
+  border-bottom: 1px dashed var(--pink-light);
+}
+
+th {
+  color: var(--pink-deep);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* ── 后台表单 ── */
+.form-row {
+  margin-bottom: 14px;
+}
+
+.form-row > label {
+  display: block;
+  font-size: 13px;
+  color: var(--ink-light);
+  margin-bottom: 6px;
+}
+
+.btn-row {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+/* ── 响应式 ── */
+@media (max-width: 640px) {
+  .page-title {
+    font-size: 26px;
+  }
+  .site-main {
+    padding: 12px 10px 40px;
+  }
+  .card {
+    padding: 16px;
+  }
+}

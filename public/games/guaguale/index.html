@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>刮刮乐</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    font-family: "Microsoft YaHei", sans-serif;
+    background: #14060d;
+    display: flex; align-items: center; justify-content: center;
+    overflow: hidden; color: #fff;
+  }
+
+  /* ── 画框：按 background.jpg 比例（1080×1069）居中，所有内容限制在图内 ── */
+  .frame {
+    position: relative;
+    width: min(100vw, calc(100vh * 1.0103));
+    height: min(100vh, calc(100vw / 1.0103));
+    background: url("assets/img-1.jpg") center / cover no-repeat,
+                linear-gradient(160deg, #b48ae0, #6a3fb5); /* 缺图时兜底 */
+    overflow: hidden;
+  }
+
+  /* 屏幕区域：只占据背景图中央的安全区（上 15%、下 3%、左右 7%） */
+  .screen {
+    display: none; position: absolute;
+    top: 15%; bottom: 3%; left: 7%; right: 7%;
+    flex-direction: column; min-height: 0;
+  }
+  .screen.active { display: flex; }
+
+  /* ── 顶栏 ── */
+  header { display: flex; align-items: flex-start; justify-content: space-between;
+           gap: 10px; margin-bottom: 10px; flex: none; }
+  .logo { width: min(240px, 34%); object-fit: contain;
+          filter: drop-shadow(0 2px 8px rgba(0,0,0,.6)); }
+  .nav { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; padding-top: 6px; }
+
+  /* ── 按钮 ── */
+  button {
+    cursor: pointer; border: 1px solid rgba(255,255,255,.4);
+    border-radius: 999px; padding: 5px 14px;
+    font-size: 13px; font-weight: bold; font-family: inherit;
+    background: rgba(60,15,35,.55); color: #ffd9e4;
+    transition: background .15s, transform .12s;
+  }
+  button:hover { background: rgba(120,30,60,.7); transform: translateY(-1px); }
+  button:active { transform: translateY(0); }
+  button.primary { background: linear-gradient(180deg, #e0507e, #b02a55); color: #fff; }
+  button.primary:hover { background: linear-gradient(180deg, #f0608e, #c03a65); }
+
+  /* ── 面板（半透明深色，保证在背景图上可读） ── */
+  .panel {
+    flex: 1; min-height: 0; display: flex; flex-direction: column;
+    background: rgba(25, 6, 16, .62);
+    border: 1.5px solid rgba(255, 180, 200, .35);
+    border-radius: 16px; padding: 14px 18px;
+    backdrop-filter: blur(3px);
+  }
+  .panel h2 {
+    text-align: center; font-size: 18px; margin-bottom: 12px; flex: none;
+    color: #ffd9e4; text-shadow: 0 0 10px #e0507e, 0 2px 3px rgba(0,0,0,.5);
+  }
+  .scroll { flex: 1; min-height: 0; overflow-y: auto; padding-right: 6px; }
+  .scroll::-webkit-scrollbar { width: 6px; }
+  .scroll::-webkit-scrollbar-thumb { background: rgba(255,150,180,.4); border-radius: 3px; }
+
+  /* ── 奖项编辑：双列紧凑网格 ── */
+  #prize-editor { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 14px; }
+  .prize-row { display: flex; gap: 6px; align-items: center; }
+  .prize-row input {
+    padding: 5px 10px; border: 1px solid rgba(255,180,200,.35); border-radius: 8px;
+    font-size: 13px; font-family: inherit;
+    background: rgba(255,255,255,.1); color: #fff; min-width: 0;
+  }
+  .prize-row input:focus { outline: none; border-color: rgba(255,200,215,.8); background: rgba(255,255,255,.18); }
+  .prize-row input.name { flex: 1; }
+  .prize-row input.qty { width: 44px; text-align: center; }
+  .prize-row .del {
+    padding: 0; width: 24px; height: 24px; flex: none;
+    font-size: 13px; line-height: 1; border-radius: 50%; border: none;
+    background: rgba(224, 80, 126, .4); color: #fff;
+  }
+  .prize-row .del:hover { background: rgba(224, 80, 126, .8); }
+  .editor-foot { display: flex; justify-content: center; padding-top: 10px; flex: none; }
+
+  /* ── 剩余奖项：双列 ── */
+  .remain-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2px 28px; }
+  .remain-item { display: flex; justify-content: space-between; padding: 6px 4px;
+                 font-size: 14px; border-bottom: 1px solid rgba(255,180,200,.18); }
+  .remain-item .n { color: #ffb3c8; font-weight: bold; }
+
+  /* ── 礼物盒网格 ── */
+  .boxes {
+    flex: 1; min-height: 0; overflow-y: auto; align-content: start;
+    display: grid; grid-template-columns: repeat(6, 1fr); gap: 12px 6px; padding: 4px 2px;
+  }
+  .boxes::-webkit-scrollbar { width: 6px; }
+  .boxes::-webkit-scrollbar-thumb { background: rgba(255,150,180,.4); border-radius: 3px; }
+  .box { display: flex; flex-direction: column; align-items: center; cursor: pointer; transition: transform .15s; }
+  .box:hover { transform: scale(1.12); }
+  /* 开盒前后两张图叠放在同一 slot，保证位置、大小完全重合 */
+  .box .slot { position: relative; width: 84px; height: 84px; }
+  .box .slot img {
+    position: absolute; inset: 0; width: 100%; height: 100%;
+    object-fit: contain; filter: drop-shadow(0 3px 4px rgba(0,0,0,.4));
+    transition: opacity .3s;
+  }
+  .box .slot .img-unbox { opacity: 0; }
+  .box.opened .slot .img-box { opacity: 0; }
+  .box.opened .slot .img-unbox { opacity: .5; animation: unbox-in .5s ease-out; }
+  .box .box-no { font-size: 14px; font-weight: bold; color: #ffe3ec; text-shadow: 0 1px 3px rgba(0,0,0,.7), 0 0 8px rgba(224,80,126,.6); margin-top: 3px; }
+  .box.opened { cursor: default; }
+  .box.opened:hover { transform: none; }
+  @keyframes unbox-in {
+    0% { opacity: 0; transform: scale(1.15); }
+    100% { opacity: .5; transform: scale(1); }
+  }
+  /* ── 开箱动画 ── */
+  .box.opening { pointer-events: none; animation: box-shake .55s ease-in-out; }
+  @keyframes box-shake {
+    0%, 100% { transform: rotate(0) scale(1); }
+    15% { transform: rotate(-8deg) scale(1.05); }
+    30% { transform: rotate(8deg) scale(1.1); }
+    45% { transform: rotate(-6deg) scale(1.15); }
+    60% { transform: rotate(6deg) scale(1.2); }
+    75% { transform: rotate(-3deg) scale(1.15); }
+    90% { transform: rotate(0) scale(1.25); filter: brightness(1.6) drop-shadow(0 0 12px #ffb3c8); }
+  }
+  @keyframes prize-pop {
+    0% { transform: scale(0); opacity: 0; }
+    70% { transform: scale(1.25); opacity: 1; }
+    100% { transform: scale(1); opacity: 1; }
+  }
+  .progress-result.flash { animation: prize-pop .4s ease-out; }
+
+  /* ── 底部进度条：固定在画框内底部 ── */
+  .progress-bar {
+    position: absolute; bottom: 1.5%; left: 7%; right: 7%;
+    display: flex; align-items: stretch; gap: 10px; z-index: 10;
+  }
+  .progress-main {
+    flex: 1; display: flex; align-items: center; gap: 14px; min-width: 0;
+    background: linear-gradient(180deg, rgba(255,248,236,.95), rgba(255,238,203,.95));
+    border: 3px solid #f0c9d8; border-radius: 16px;
+    padding: 12px 18px; box-shadow: 0 4px 14px rgba(0,0,0,.5);
+  }
+  .progress-main img.gift { height: 64px; flex: none; filter: drop-shadow(0 2px 3px rgba(0,0,0,.2)); }
+  .progress-text { flex: 1; text-align: center; min-width: 0; }
+  .progress-label { font-size: 14px; font-weight: bold; color: #b02a55; margin-bottom: 3px; }
+  .progress-result {
+    font-size: 34px; font-weight: 900; color: #e0304e; line-height: 1.1;
+    text-shadow: 0 2px 0 #fff, 0 3px 6px rgba(0,0,0,.15);
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .restart-wrap {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    background: linear-gradient(180deg, rgba(255,248,236,.95), rgba(255,238,203,.95));
+    border: 3px solid #f0c9d8; border-radius: 16px; padding: 6px 18px;
+    box-shadow: 0 4px 14px rgba(0,0,0,.5); cursor: pointer; transition: transform .12s;
+    flex: none;
+  }
+  .restart-wrap:hover { transform: scale(1.04); }
+  .restart-wrap img { height: 32px; }
+  .restart-wrap .r1 { font-size: 14px; font-weight: bold; color: #7a1f40; }
+  .restart-wrap .r2 { font-size: 13px; font-weight: bold; color: #e0304e; }
+
+  /* ── 中奖者输入栏（开奖后出现在底部文字栏右侧） ── */
+  .winner-box { display: flex; align-items: center; gap: 8px; flex: none; }
+  .winner-box[hidden] { display: none; }
+  .winner-box input {
+    width: 120px; padding: 6px 12px; font-size: 14px; font-family: inherit;
+    color: #7a1f40; background: rgba(255,255,255,.85);
+    border: 2px solid #f0c9d8; border-radius: 999px;
+  }
+  .winner-box input:focus { outline: none; border-color: #e0507e; }
+  .winner-box input::placeholder { color: #c98aa0; }
+  .winner-box button { border-color: #e0b8c8; padding: 6px 16px; font-size: 13px; white-space: nowrap; }
+
+  /* ── 获奖表单 ── */
+  .winner-table { display: flex; flex-direction: column; }
+  .winner-row {
+    display: grid; grid-template-columns: 64px 1fr 1fr; gap: 10px;
+    padding: 7px 6px; font-size: 14px; color: #ffe9f0;
+    border-bottom: 1px solid rgba(255,180,200,.18);
+  }
+  .winner-row.head { font-weight: bold; color: #ffb3c8; border-bottom-color: rgba(255,180,200,.4); }
+  .winner-row .w { font-weight: bold; color: #ffd9e4; }
+  .winner-empty { text-align: center; padding: 24px 0; font-size: 14px; color: rgba(255,217,228,.7); }
+</style>
+</head>
+<body>
+
+<!-- ══════════ 素材接口：把路径替换成自己的图片即可 ══════════ -->
+<script>
+const ASSETS = {
+  logo:    "assets/img-2.webp",    // 左上角贴图（黧温婉 logo）
+  box:     "assets/img-3.webp",     // 未开启的礼物盒
+  unbox:   "assets/img-4.webp",   // 开启后的礼物盒（降低透明度显示）
+  gift:    "assets/img-5.webp",    // 进度条左侧的大礼盒
+  restart: "assets/img-6.webp", // 重新开始按钮的循环箭头图标
+  // 背景图路径写在 CSS 顶部 .frame 的 background 里：assets/img-1.jpg
+};
+const CONFIG = {
+  restartLine1: "重新开始",
+  restartLine2: "黧温婉专用",
+};
+</script>
+
+<div class="frame">
+
+  <!-- 界面一：主界面（奖项详情，可编辑） -->
+  <div class="screen active" id="screen-home">
+    <header>
+      <img class="logo" data-logo alt="logo">
+      <div class="nav">
+        <button data-go="screen-remain">剩余奖项</button>
+        <button data-go="screen-winners">查看奖励</button>
+        <button class="primary" data-go="screen-draw">开始抽奖</button>
+      </div>
+    </header>
+    <div class="panel">
+      <h2>奖项详情 · 共 <span id="total-count">0</span> 份</h2>
+      <div class="scroll"><div id="prize-editor"></div></div>
+      <div class="editor-foot"><button id="add-prize">+ 添加奖项</button></div>
+    </div>
+  </div>
+
+  <!-- 界面二：剩余奖项 -->
+  <div class="screen" id="screen-remain">
+    <header>
+      <img class="logo" data-logo alt="logo">
+      <div class="nav">
+        <button data-go="screen-home">← 奖项详情</button>
+        <button data-go="screen-winners">查看奖励</button>
+        <button class="primary" data-go="screen-draw">开始抽奖</button>
+      </div>
+    </header>
+    <div class="panel">
+      <h2>剩余奖项 · 共 <span id="remain-total">0</span> 份</h2>
+      <div class="scroll"><div class="remain-grid" id="remain-body"></div></div>
+    </div>
+  </div>
+
+  <!-- 界面三：抽奖 -->
+  <div class="screen" id="screen-draw">
+    <header>
+      <img class="logo" data-logo alt="logo">
+      <div class="nav">
+        <button data-go="screen-home">奖项详情</button>
+        <button data-go="screen-remain">剩余奖项</button>
+        <button data-go="screen-winners">查看奖励</button>
+      </div>
+    </header>
+    <div class="boxes" id="boxes"></div>
+    <div class="progress-bar">
+      <div class="progress-main">
+        <img class="gift" id="gift-img" alt="礼盒">
+        <div class="progress-text">
+          <div class="progress-label" id="progress-label">当前进度 · 已准备就绪</div>
+          <div class="progress-result" id="progress-result">准备好了！</div>
+        </div>
+        <div class="winner-box" id="winner-box" hidden>
+          <input id="winner-name" placeholder="谁中的？" maxlength="20">
+          <button class="primary" id="winner-ok">确定</button>
+        </div>
+      </div>
+      <div class="restart-wrap" id="restart">
+        <img id="restart-img" alt="重开">
+        <span class="r1" id="restart-l1"></span>
+        <span class="r2" id="restart-l2"></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 界面四：查看奖励（获奖汇总表） -->
+  <div class="screen" id="screen-winners">
+    <header>
+      <img class="logo" data-logo alt="logo">
+      <div class="nav">
+        <button data-go="screen-home">奖项详情</button>
+        <button data-go="screen-remain">剩余奖项</button>
+        <button class="primary" data-go="screen-draw">开始抽奖</button>
+      </div>
+    </header>
+    <div class="panel">
+      <h2>获奖表单 · 已开出 <span id="winners-total">0</span> 份</h2>
+      <div class="scroll">
+        <div class="winner-table">
+          <div class="winner-row head"><span>箱号</span><span>奖项</span><span>中奖者</span></div>
+          <div id="winners-body"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+/* ============ 数据层 ============ */
+const LS_KEY = "gualale_prizes_v2";
+
+const DEFAULT_PRIZES = [
+  { name: "铁山靠", qty: 1 },
+  { name: "再来一次", qty: 1 },
+  { name: "打主播66下", qty: 1 },
+  { name: "随机动态壁纸", qty: 1 },
+  { name: "主播高歌一曲", qty: 1 },
+  { name: "主播舞蹈展示", qty: 1 },
+  { name: "指定形象半小时", qty: 1 },
+  { name: "主播发福袋感恩", qty: 1 },
+  { name: "敲诈一个暮光星辰", qty: 1 },
+  { name: "win版鼠标指针", qty: 1 },
+  { name: "数字炸弹", qty: 2 },
+  { name: "提问一次", qty: 2 },
+  { name: "账号分析", qty: 2 },
+  { name: "互动：猜性别", qty: 2 },
+  { name: "互动：猜颜色", qty: 2 },
+  { name: "kisskiss", qty: 2 },
+  { name: "敲诈10个小心心", qty: 2 },
+  { name: "谢谢", qty: 3 },
+  { name: "夹紧十分钟", qty: 3 },
+];
+
+let prizes = load();
+let pool = [], opened = [], winners = [], started = false;
+let pendingWinnerIdx = -1; // 当前等待填写中奖者的箱号
+
+function load() {
+  try {
+    const d = JSON.parse(localStorage.getItem(LS_KEY));
+    if (Array.isArray(d) && d.length) return d;
+  } catch (e) {}
+  return JSON.parse(JSON.stringify(DEFAULT_PRIZES));
+}
+function save() { localStorage.setItem(LS_KEY, JSON.stringify(prizes)); }
+function totalQty() { return prizes.reduce((s, p) => s + (p.qty || 0), 0); }
+function shuffle(a) {
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+/* ============ 界面切换 ============ */
+function go(id) {
+  document.querySelectorAll(".screen").forEach(s => s.classList.toggle("active", s.id === id));
+  if (id === "screen-remain") renderRemain();
+  if (id === "screen-winners") renderWinners();
+  if (id === "screen-draw" && !started) renderBoxes();
+}
+document.querySelectorAll("[data-go]").forEach(b => b.onclick = () => go(b.dataset.go));
+
+/* ============ 界面一：奖项编辑 ============ */
+function renderEditor() {
+  const wrap = document.getElementById("prize-editor");
+  wrap.innerHTML = "";
+  prizes.forEach((p, i) => {
+    const row = document.createElement("div");
+    row.className = "prize-row";
+    row.innerHTML = `
+      <input class="name" value="${p.name}" placeholder="奖项名称">
+      <input class="qty" type="number" min="0" value="${p.qty}">
+      <button class="del" title="删除">×</button>`;
+    row.querySelector(".name").oninput = e => { p.name = e.target.value; save(); };
+    row.querySelector(".qty").oninput  = e => { p.qty = Math.max(0, +e.target.value || 0); save(); updateTotal(); };
+    row.querySelector(".del").onclick  = () => { prizes.splice(i, 1); save(); renderEditor(); };
+    wrap.appendChild(row);
+  });
+  updateTotal();
+}
+function updateTotal() { document.getElementById("total-count").textContent = totalQty(); }
+document.getElementById("add-prize").onclick = () => { prizes.push({ name: "新奖项", qty: 1 }); save(); renderEditor(); };
+
+/* ============ 界面二：剩余奖项 ============ */
+function renderRemain() {
+  const body = document.getElementById("remain-body");
+  body.innerHTML = "";
+  let total = 0;
+  const put = (name, n) => {
+    total += n;
+    const d = document.createElement("div");
+    d.className = "remain-item";
+    d.innerHTML = `<span>◆ ${name}</span><span class="n">×${n}</span>`;
+    body.appendChild(d);
+  };
+  if (started) {
+    const left = {};
+    pool.forEach((name, i) => { if (!opened[i]) left[name] = (left[name] || 0) + 1; });
+    Object.entries(left).forEach(([name, n]) => put(name, n));
+  } else {
+    prizes.forEach(p => { if (p.qty > 0) put(p.name, p.qty); });
+  }
+  document.getElementById("remain-total").textContent = total;
+}
+
+/* ============ 界面三：抽奖 ============ */
+function newGame() {
+  pool = shuffle(prizes.flatMap(p => Array(p.qty).fill(p.name)));
+  opened = Array(pool.length).fill(false);
+  winners = Array(pool.length).fill("");
+  started = false;
+  pendingWinnerIdx = -1;
+  document.getElementById("winner-box").hidden = true;
+  document.getElementById("progress-label").textContent = "当前进度 · 已准备就绪";
+  document.getElementById("progress-result").textContent = "准备好了！";
+  renderBoxes();
+}
+
+function renderBoxes() {
+  const wrap = document.getElementById("boxes");
+  wrap.innerHTML = "";
+  pool.forEach((prize, i) => {
+    const d = document.createElement("div");
+    d.className = "box" + (opened[i] ? " opened" : "");
+    // 开盒前后两张图始终叠放在同一 slot，切换时位置完全重合
+    const slot = document.createElement("div");
+    slot.className = "slot";
+    slot.innerHTML = `
+      <img class="img-box" src="${ASSETS.box}" alt="礼物盒" onerror="this.style.display='none'">
+      <img class="img-unbox" src="${ASSETS.unbox}" alt="开礼盒" onerror="this.style.display='none'">`;
+    d.appendChild(slot);
+    d.insertAdjacentHTML("beforeend", `<span class="box-no">${i + 1}</span>`);
+    if (!opened[i]) d.onclick = () => openBox(i, d);
+    wrap.appendChild(d);
+  });
+}
+
+function openBox(i, el) {
+  if (opened[i]) return;
+  started = true;
+  opened[i] = true;
+  el.classList.add("opening");
+  setTimeout(() => {
+    document.getElementById("progress-label").textContent = `当前进度 · ${i + 1}号箱`;
+    const result = document.getElementById("progress-result");
+    result.textContent = pool[i];
+    result.classList.remove("flash");
+    void result.offsetWidth;
+    result.classList.add("flash");
+    renderBoxes();
+    showWinnerInput(i);
+  }, 550);
+}
+
+/* ── 中奖者填写 ── */
+function showWinnerInput(i) {
+  pendingWinnerIdx = i;
+  const box = document.getElementById("winner-box");
+  const input = document.getElementById("winner-name");
+  input.value = winners[i] || "";
+  box.hidden = false;
+  input.focus();
+}
+function confirmWinner() {
+  if (pendingWinnerIdx < 0) return;
+  winners[pendingWinnerIdx] = document.getElementById("winner-name").value.trim();
+  pendingWinnerIdx = -1;
+  document.getElementById("winner-box").hidden = true;
+}
+document.getElementById("winner-ok").onclick = confirmWinner;
+document.getElementById("winner-name").onkeydown = e => { if (e.key === "Enter") confirmWinner(); };
+
+/* ============ 界面四：获奖表单 ============ */
+function renderWinners() {
+  const body = document.getElementById("winners-body");
+  body.innerHTML = "";
+  let total = 0;
+  pool.forEach((prize, i) => {
+    if (!opened[i]) return;
+    total++;
+    const d = document.createElement("div");
+    d.className = "winner-row";
+    d.innerHTML = `<span>${i + 1}号</span><span>${prize}</span><span class="w">${winners[i] || "—"}</span>`;
+    body.appendChild(d);
+  });
+  if (!total) body.innerHTML = `<div class="winner-empty">还没有开奖记录，快去抽一箱吧～</div>`;
+  document.getElementById("winners-total").textContent = total;
+}
+
+document.getElementById("restart").onclick = newGame;
+
+/* ============ 素材加载（缺图时用 emoji 兜底） ============ */
+function setImg(el, src, fallbackEmoji, size) {
+  el.src = src;
+  el.onerror = () => el.replaceWith(Object.assign(document.createElement("span"), {
+    textContent: fallbackEmoji, style: `font-size:${size}px` }));
+}
+document.querySelectorAll("[data-logo]").forEach(img => setImg(img, ASSETS.logo, "🎀", 64));
+setImg(document.getElementById("gift-img"), ASSETS.gift, "🎁", 46);
+setImg(document.getElementById("restart-img"), ASSETS.restart, "🔄", 26);
+document.getElementById("restart-l1").textContent = CONFIG.restartLine1;
+document.getElementById("restart-l2").textContent = CONFIG.restartLine2;
+
+renderEditor();
+newGame();
+</script>
+</body>
+</html>

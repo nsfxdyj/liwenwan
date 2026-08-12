@@ -1,0 +1,38 @@
+[
+  {
+    "id": "g1",
+    "title": "8月舰长限定明信片",
+    "image": "",
+    "description": "8月限定手绘风明信片一张，含主播亲笔留言。",
+    "month": "2026-08",
+    "status": "on",
+    "sort": 1
+  },
+  {
+    "id": "g2",
+    "title": "8月提督定制徽章",
+    "image": "",
+    "description": "提督专属金属徽章，粉紫配色小狐狸造型。",
+    "month": "2026-08",
+    "status": "on",
+    "sort": 2
+  },
+  {
+    "id": "g3",
+    "title": "7月舰长限定透卡",
+    "image": "",
+    "description": "7月限定透明收藏卡，夏日主题。",
+    "month": "2026-07",
+    "status": "on",
+    "sort": 1
+  },
+  {
+    "id": "g4",
+    "title": "6月舰长限定贴纸包",
+    "image": "",
+    "description": "6月限定贴纸一包（已下架纪念展示）。",
+    "month": "2026-06",
+    "status": "off",
+    "sort": 1
+  }
+]
