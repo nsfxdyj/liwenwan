@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, onUnmounted, ref } from 'vue';
-import { useDataStore, type GiftItem, type HonorItem } from '../stores/data';
+import { useDataStore, type GiftItem } from '../stores/data';
 import { currentMonthBJ } from '../utils/time';
 
 const store = useDataStore();
@@ -29,19 +29,6 @@ const pastGroups = computed(() => {
   return Array.from(groups.entries())
     .sort((a, b) => b[0].localeCompare(a[0]))
     .map(([month, items]) => ({ month, items: items.sort((a, b) => a.sort - b.sort) }));
-});
-
-// 大航海感谢名单按等级分组
-const honorGroups = computed(() => {
-  const order = ['总督', '提督', '舰长'];
-  const groups = new Map<string, HonorItem[]>();
-  for (const h of store.remote.guard_honor) {
-    if (!groups.has(h.level)) groups.set(h.level, []);
-    groups.get(h.level)!.push(h);
-  }
-  return Array.from(groups.entries()).sort(
-    (a, b) => (order.indexOf(a[0]) === -1 ? 99 : order.indexOf(a[0])) - (order.indexOf(b[0]) === -1 ? 99 : order.indexOf(b[0])),
-  );
 });
 </script>
 
@@ -73,20 +60,6 @@ const honorGroups = computed(() => {
             <div v-else class="gift-img gift-img-placeholder">🎀</div>
             <h3 class="gift-title">{{ g.title }}</h3>
             <p class="gift-desc">{{ g.description }}</p>
-          </div>
-        </div>
-      </div>
-    </template>
-
-    <template v-if="honorGroups.length">
-      <h2 class="section-title">⚓ 大航海感谢名单</h2>
-      <div class="card honor-card">
-        <div v-for="[level, members] in honorGroups" :key="level" class="honor-group">
-          <h3 class="honor-level">{{ level }}</h3>
-          <div class="honor-names">
-            <span v-for="m in members" :key="m.id" class="honor-name">
-              {{ m.nickname }}<i v-if="m.on_board" title="在船中">⛵</i>
-            </span>
           </div>
         </div>
       </div>
@@ -149,32 +122,5 @@ const honorGroups = computed(() => {
 .empty {
   color: var(--ink-light);
   padding: 16px 0;
-}
-.honor-card {
-  margin-bottom: 10px;
-}
-.honor-group {
-  margin-bottom: 14px;
-}
-.honor-level {
-  color: var(--purple);
-  font-size: 15px;
-  margin-bottom: 8px;
-}
-.honor-names {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-.honor-name {
-  background: var(--pink-light);
-  color: var(--pink-deep);
-  border-radius: 999px;
-  padding: 4px 12px;
-  font-size: 13px;
-}
-.honor-name i {
-  font-style: normal;
-  margin-left: 4px;
 }
 </style>

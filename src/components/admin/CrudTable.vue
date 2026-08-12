@@ -71,12 +71,28 @@ function cancelEdit() {
 function save() {
   // 保存前按数据类型校验关键字段
   error.value = '';
-  if (props.dataKey === 'birthdays') {
-    if (!/^(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$/.test(String(editing.value.birthday ?? '').trim())) {
-      error.value = '生日格式不正确，应为 MM-DD（如 08-12）';
+  if (props.dataKey === 'points') {
+    const uid = String(editing.value.uid ?? '').trim();
+    if (!uid) {
+      error.value = 'UID 必填';
       return;
     }
-    editing.value.birthday = editing.value.birthday.trim();
+    if (!/^\d+$/.test(uid)) {
+      error.value = 'UID 必须为纯数字';
+      return;
+    }
+    const raw = editing.value.points;
+    if (raw === '' || raw === null || raw === undefined) {
+      error.value = '积分必填';
+      return;
+    }
+    const p = Number(raw);
+    if (!Number.isInteger(p) || p < 0) {
+      error.value = '积分必须为非负整数';
+      return;
+    }
+    editing.value.uid = uid;
+    editing.value.points = p;
   }
   if (props.dataKey === 'events') {
     const t = parseBJ(String(editing.value.event_at ?? ''));

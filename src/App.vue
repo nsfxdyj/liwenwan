@@ -39,7 +39,7 @@ onMounted(async () => {
 </script>
 
 <template>
-  <LoadingScreen v-if="showLoading" :logo="store.remote.settings.logo" :site-name="store.remote.settings.site_name" />
+  <LoadingScreen v-if="showLoading" :site-name="store.remote.settings.site_name" />
   <template v-else>
     <div class="wallpaper" :style="wallpaperStyle"></div>
     <div v-if="store.loadError" class="load-error">{{ store.loadError }}</div>

@@ -14,6 +14,7 @@ export interface Settings {
   site_name: string;
   logo: string;
   wallpaper: string;
+  home_deco: string;
   welcome_lines: string[];
   home_popup: { content: string; enabled: boolean };
   gift_notice: string;
@@ -25,9 +26,8 @@ export interface NewsItem { id: string; title: string; content: string; created_
 export interface GiftItem { id: string; title: string; image: string; description: string; month: string; status: 'on' | 'off'; sort: number }
 export interface SongItem { id: string; name: string; artist: string; note: string }
 export interface EventItem { id: string; title: string; event_at: string; description: string }
-export interface BirthdayItem { id: string; nickname: string; birthday: string }
 export interface VideoItem { id: string; bvid: string; title: string; cover: string; description: string; category: string; created_at: string }
-export interface HonorItem { id: string; nickname: string; level: string; on_board: boolean; note: string }
+export interface PointItem { id: string; uid: string; nickname: string; points: number }
 
 export const DATA_FILES = [
   'settings',
@@ -35,9 +35,8 @@ export const DATA_FILES = [
   'gifts',
   'songs',
   'events',
-  'birthdays',
   'videos',
-  'guard_honor',
+  'points',
 ] as const;
 
 export type DataKey = (typeof DATA_FILES)[number];
@@ -48,9 +47,8 @@ const DATA_LABELS: Record<DataKey, string> = {
   gifts: '舰礼',
   songs: '歌单',
   events: '活动',
-  birthdays: '生日墙',
   videos: '视频',
-  guard_honor: '感谢名单',
+  points: '积分',
 };
 
 export function dataLabel(key: DataKey): string {
@@ -61,6 +59,7 @@ const DEFAULT_SETTINGS: Settings = {
   site_name: '黧温婉粉丝站',
   logo: '',
   wallpaper: '',
+  home_deco: '',
   welcome_lines: [],
   home_popup: { content: '', enabled: false },
   gift_notice: '',
@@ -74,9 +73,8 @@ type DraftState = {
   gifts: GiftItem[];
   songs: SongItem[];
   events: EventItem[];
-  birthdays: BirthdayItem[];
   videos: VideoItem[];
-  guard_honor: HonorItem[];
+  points: PointItem[];
 };
 
 function emptyDraft(): DraftState {
@@ -86,9 +84,8 @@ function emptyDraft(): DraftState {
     gifts: [],
     songs: [],
     events: [],
-    birthdays: [],
     videos: [],
-    guard_honor: [],
+    points: [],
   };
 }
 

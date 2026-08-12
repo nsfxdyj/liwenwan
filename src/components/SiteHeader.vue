@@ -15,6 +15,7 @@ const navs = [
   { to: '/songs', label: '歌单' },
   { to: '/calendar', label: '日历' },
   { to: '/videos', label: '视频' },
+  { to: '/points', label: '积分' },
   { to: '/games', label: '游戏' },
   { to: '/about', label: '关于' },
 ];
@@ -62,12 +63,15 @@ const navs = [
   gap: 10px;
 }
 .brand-logo {
+  height: 40px;
+  width: auto;
+  max-width: 120px;
+  object-fit: contain;
+}
+.brand-logo-text {
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  object-fit: cover;
-}
-.brand-logo-text {
   display: flex;
   align-items: center;
   justify-content: center;

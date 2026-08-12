@@ -1,8 +1,0 @@
-[
-  { "id": "h1", "nickname": "狐尾草摇摇", "level": "总督", "on_board": true, "note": "开站元老" },
-  { "id": "h2", "nickname": "奶油泡芙狐", "level": "提督", "on_board": true, "note": "" },
-  { "id": "h3", "nickname": "星星落兜里", "level": "提督", "on_board": false, "note": "7月在船" },
-  { "id": "h4", "nickname": "一只小笨狐", "level": "舰长", "on_board": true, "note": "" },
-  { "id": "h5", "nickname": "晚风与狐", "level": "舰长", "on_board": true, "note": "" },
-  { "id": "h6", "nickname": "糯米团子酱", "level": "舰长", "on_board": false, "note": "" }
-]

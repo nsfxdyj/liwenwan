@@ -10,6 +10,7 @@ const router = createRouter({
     { path: '/songs', name: 'songs', component: () => import('../views/SongsView.vue'), meta: { title: '歌单' } },
     { path: '/calendar', name: 'calendar', component: () => import('../views/CalendarView.vue'), meta: { title: '日历' } },
     { path: '/videos', name: 'videos', component: () => import('../views/VideosView.vue'), meta: { title: '视频' } },
+    { path: '/points', name: 'points', component: () => import('../views/PointsView.vue'), meta: { title: '积分' } },
     { path: '/games', name: 'games', component: () => import('../views/GamesView.vue'), meta: { title: '游戏' } },
     { path: '/about', name: 'about', component: () => import('../views/AboutView.vue'), meta: { title: '关于' } },
     { path: '/admin', name: 'admin', component: () => import('../views/AdminView.vue'), meta: { title: '管理后台' } },

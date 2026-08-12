@@ -1,34 +1,56 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { computed, onUnmounted, ref } from 'vue';
 
 type GameKey = 'bomb' | 'dice' | 'guaguale';
 const active = ref<GameKey>('bomb');
 
-/* ── 数字炸弹 ── */
+/* ── 数字炸弹（10×10 格子矩阵，点击格子猜数） ── */
 const bomb = ref(0);
 const low = ref(1);
 const high = ref(100);
-const guess = ref('');
+const attempts = ref(0);
+const lastPicked = ref(0); // 最近一次点击的数字（触发动画用）
 const bombMsg = ref('');
 const exploded = ref(false);
+
+const explodeGif = `${import.meta.env.BASE_URL}uploads/bomb-explode.gif`;
 
 function resetBomb() {
   bomb.value = Math.floor(Math.random() * 100) + 1;
   low.value = 1;
   high.value = 100;
-  guess.value = '';
-  bombMsg.value = '炸弹已埋好（1–100），开始猜吧！';
+  attempts.value = 0;
+  lastPicked.value = 0;
+  bombMsg.value = '炸弹已埋好（1–100），点一个格子开始猜！';
   exploded.value = false;
 }
 resetBomb();
 
-function submitGuess() {
-  if (exploded.value) return;
-  const n = Number(guess.value);
-  if (!Number.isInteger(n) || n < low.value || n > high.value) {
-    bombMsg.value = `请输入 ${low.value} 到 ${high.value} 之间的整数`;
-    return;
+interface BombCell {
+  n: number;
+  eliminated: boolean; // 已排除（在当前有效区间外）
+  isBomb: boolean; // 爆炸后标记炸弹格
+  picked: boolean; // 最近一次点击
+}
+
+const bombCells = computed<BombCell[]>(() => {
+  const list: BombCell[] = [];
+  for (let n = 1; n <= 100; n++) {
+    list.push({
+      n,
+      eliminated: n < low.value || n > high.value,
+      isBomb: exploded.value && n === bomb.value,
+      picked: n === lastPicked.value,
+    });
   }
+  return list;
+});
+
+function pickCell(cell: BombCell) {
+  if (exploded.value || cell.eliminated) return;
+  const n = cell.n;
+  attempts.value++;
+  lastPicked.value = n;
   if (n === bomb.value) {
     exploded.value = true;
     bombMsg.value = '💥 砰！你踩到炸弹了！';
@@ -39,7 +61,6 @@ function submitGuess() {
     high.value = n - 1;
     bombMsg.value = `安全～范围缩小为 ${low.value} – ${high.value}`;
   }
-  guess.value = '';
 }
 
 /* ── 掷骰子 ── */
@@ -47,20 +68,26 @@ const diceCount = ref(1);
 const diceResults = ref<number[]>([1]);
 const rolling = ref(false);
 const diceTotal = computed(() => diceResults.value.reduce((a, b) => a + b, 0));
+let diceTimer: ReturnType<typeof setInterval> | null = null;
 
 function rollDice() {
   if (rolling.value) return;
   rolling.value = true;
   let ticks = 0;
-  const timer = setInterval(() => {
+  diceTimer = setInterval(() => {
     diceResults.value = Array.from({ length: diceCount.value }, () => Math.floor(Math.random() * 6) + 1);
     ticks++;
     if (ticks >= 10) {
-      clearInterval(timer);
+      if (diceTimer) clearInterval(diceTimer);
+      diceTimer = null;
       rolling.value = false;
     }
   }, 80);
 }
+
+onUnmounted(() => {
+  if (diceTimer) clearInterval(diceTimer);
+});
 
 const guagualeUrl = `${import.meta.env.BASE_URL}games/guaguale/index.html`;
 </script>
@@ -79,20 +106,30 @@ const guagualeUrl = `${import.meta.env.BASE_URL}games/guaguale/index.html`;
     <div v-if="active === 'bomb'" class="card game-card">
       <h3 class="game-title">💣 数字炸弹</h3>
       <p class="game-msg" :class="{ boom: exploded }">{{ bombMsg }}</p>
-      <div v-if="exploded" class="explode">💥</div>
-      <div class="btn-row" style="justify-content: center">
-        <template v-if="!exploded">
-          <input
-            v-model="guess"
-            type="number"
-            class="guess-input"
-            :placeholder="`${low} - ${high}`"
-            @keyup.enter="submitGuess"
-          />
-          <button @click="submitGuess">猜！</button>
-        </template>
-        <button v-else @click="resetBomb">再来一局</button>
+      <p class="bomb-status">当前区间：{{ low }} – {{ high }}　|　已猜 {{ attempts }} 次</p>
+      <div class="bomb-grid">
+        <button
+          v-for="cell in bombCells"
+          :key="cell.n + '-' + cell.picked"
+          :class="['bomb-cell', { eliminated: cell.eliminated, 'is-bomb': cell.isBomb, pulse: cell.picked && !exploded }]"
+          :disabled="cell.eliminated || exploded"
+          @click="pickCell(cell)"
+        >{{ cell.isBomb ? '💣' : cell.n }}</button>
       </div>
+      <div class="btn-row" style="justify-content: center; margin-top: 16px">
+        <button class="plain" @click="resetBomb">重新开始</button>
+      </div>
+
+      <!-- 爆炸效果：全屏居中覆盖 -->
+      <transition name="fade">
+        <div v-if="exploded" class="explode-mask">
+          <div class="explode-box">
+            <img :src="explodeGif" alt="爆炸" class="explode-gif" />
+            <p class="explode-text">用了 {{ attempts }} 次猜中炸弹！</p>
+            <button @click="resetBomb">再来一局</button>
+          </div>
+        </div>
+      </transition>
     </div>
 
     <div v-else-if="active === 'dice'" class="card game-card">
@@ -136,20 +173,89 @@ const guagualeUrl = `${import.meta.env.BASE_URL}games/guaguale/index.html`;
   margin-bottom: 14px;
 }
 .game-msg {
-  margin-bottom: 14px;
+  margin-bottom: 10px;
   color: var(--ink-light);
 }
 .game-msg.boom {
   color: #e0506e;
   font-weight: 700;
 }
-.explode {
-  font-size: 64px;
-  animation: boom 0.5s ease;
-  margin-bottom: 10px;
+.bomb-status {
+  font-size: 13px;
+  color: var(--ink-light);
+  margin-bottom: 14px;
 }
-.guess-input {
-  max-width: 160px;
+.bomb-grid {
+  display: grid;
+  grid-template-columns: repeat(10, 1fr);
+  gap: 6px;
+  max-width: 560px;
+  margin: 0 auto;
+}
+.bomb-cell {
+  aspect-ratio: 1;
+  padding: 0;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #fff;
+  background: linear-gradient(140deg, var(--pink), var(--purple));
+  transition: transform 0.2s ease, opacity 0.2s ease, background 0.2s ease;
+}
+.bomb-cell:not(:disabled):hover {
+  transform: translateY(-2px) scale(1.08);
+  box-shadow: 0 4px 10px rgba(240, 98, 146, 0.35);
+}
+.bomb-cell.eliminated {
+  background: #e9e2ec;
+  color: #b6aabd;
+  text-decoration: line-through;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+.bomb-cell.is-bomb {
+  background: linear-gradient(140deg, #ff5f6d, #c0392b);
+  font-size: 16px;
+  animation: boom 0.5s ease;
+}
+.bomb-cell.pulse {
+  animation: cell-pulse 0.35s ease;
+}
+.explode-mask {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  background: rgba(40, 16, 30, 0.72);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.explode-box {
+  text-align: center;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 20px;
+  padding: 24px 32px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.35);
+  animation: boom 0.45s ease;
+}
+.explode-gif {
+  width: min(280px, 60vw);
+  border-radius: 14px;
+}
+.explode-text {
+  margin: 12px 0 16px;
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--pink-deep);
+}
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.35s ease;
+}
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
 }
 .dice-options {
   display: flex;
@@ -194,8 +300,22 @@ const guagualeUrl = `${import.meta.env.BASE_URL}games/guaguale/index.html`;
   60% { transform: scale(1.4); }
   100% { transform: scale(1); }
 }
+@keyframes cell-pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.25); }
+  100% { transform: scale(1); }
+}
 @keyframes shake {
   0% { transform: rotate(-10deg); }
   100% { transform: rotate(10deg); }
+}
+@media (max-width: 640px) {
+  .bomb-grid {
+    gap: 4px;
+  }
+  .bomb-cell {
+    font-size: 11px;
+    border-radius: 6px;
+  }
 }
 </style>

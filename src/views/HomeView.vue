@@ -60,8 +60,9 @@ const entries = [
   { to: '/news', icon: '📰', label: '动态', desc: '主播最新公告' },
   { to: '/gifts', icon: '🎁', label: '舰礼', desc: '每月上舰回馈' },
   { to: '/songs', icon: '🎵', label: '歌单', desc: '点歌台开张啦' },
-  { to: '/calendar', icon: '📅', label: '日历', desc: '活动与生日' },
+  { to: '/calendar', icon: '📅', label: '日历', desc: '活动安排' },
   { to: '/videos', icon: '🎬', label: '视频', desc: '精彩片段回顾' },
+  { to: '/points', icon: '🏆', label: '积分', desc: '笨狐黧积分榜' },
   { to: '/games', icon: '🎮', label: '游戏', desc: '摸鱼小游戏' },
   { to: '/about', icon: '💌', label: '关于', desc: '关于本站' },
 ];
@@ -70,7 +71,8 @@ const entries = [
 <template>
   <div class="home">
     <section class="hero card">
-      <div class="hero-deco">🦊</div>
+      <img v-if="settings.home_deco" :src="settings.home_deco" alt="装饰图" class="hero-deco" />
+      <div v-else class="hero-deco hero-deco-emoji">🦊</div>
       <h1 class="hero-title">{{ settings.site_name || '黧温婉粉丝站' }}</h1>
       <transition name="fade" mode="out-in">
         <p v-if="lines.length" :key="currentLine" class="hero-line">{{ lines[currentLine] }}</p>
@@ -114,8 +116,12 @@ const entries = [
   position: absolute;
   top: 16px;
   right: 22px;
+  width: 120px;
+  animation: float 3s ease-in-out infinite;
+}
+.hero-deco-emoji {
+  width: auto;
   font-size: 52px;
-  animation: swing 2.6s ease-in-out infinite;
 }
 .hero-title {
   font-size: 44px;
@@ -206,13 +212,20 @@ const entries = [
 .fade-leave-to {
   opacity: 0;
 }
-@keyframes swing {
-  0%, 100% { transform: rotate(-8deg); }
-  50% { transform: rotate(8deg); }
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
 }
 @media (max-width: 640px) {
   .hero-title {
     font-size: 30px;
+  }
+  .hero-deco {
+    width: 72px;
+  }
+  .hero-deco-emoji {
+    width: auto;
+    font-size: 36px;
   }
 }
 </style>

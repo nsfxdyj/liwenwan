@@ -15,7 +15,7 @@ form.welcomeText = (form.welcome_lines ?? []).join('\n');
 const msg = ref('');
 const imgError = ref('');
 
-async function onPick(field: 'logo' | 'wallpaper', ev: Event) {
+async function onPick(field: 'logo' | 'wallpaper' | 'home_deco', ev: Event) {
   imgError.value = '';
   const file = (ev.target as HTMLInputElement).files?.[0];
   if (!file) return;
@@ -71,6 +71,13 @@ const contacts = computed(() => form.contacts);
       <img v-if="form.wallpaper" :src="form.wallpaper" class="preview" alt="壁纸" />
       <input type="file" accept="image/jpeg,image/png,image/webp" @change="onPick('wallpaper', $event)" />
       <p v-if="form.wallpaper" class="hint"><a href="javascript:;" @click="form.wallpaper = ''">移除壁纸（恢复默认渐变背景）</a></p>
+    </div>
+
+    <div class="form-row">
+      <label>主页装饰图（≤300KB，jpg/png/webp，显示在主页大标题右侧）</label>
+      <img v-if="form.home_deco" :src="form.home_deco" class="preview deco" alt="主页装饰图" />
+      <input type="file" accept="image/jpeg,image/png,image/webp" @change="onPick('home_deco', $event)" />
+      <p v-if="form.home_deco" class="hint"><a href="javascript:;" @click="form.home_deco = ''">移除装饰图（恢复默认图标）</a></p>
     </div>
     <p v-if="imgError" class="error">{{ imgError }}</p>
 
@@ -128,10 +135,9 @@ const contacts = computed(() => form.contacts);
   margin-bottom: 8px;
 }
 .preview.logo {
-  width: 80px;
-  height: 80px;
-  object-fit: cover;
-  border-radius: 50%;
+  max-width: 160px;
+  height: auto;
+  object-fit: contain;
 }
 .contact-row {
   display: flex;

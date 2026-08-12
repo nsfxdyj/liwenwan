@@ -29,7 +29,6 @@ function backToday() {
 
 interface CellDay {
   day: number;
-  birthdays: string[];
   events: EventItem[];
   isToday: boolean;
 }
@@ -46,9 +45,6 @@ const cells = computed(() => {
     const dateStr = `${viewYear.value}-${mm}-${dd}`;
     list.push({
       day: d,
-      birthdays: store.remote.birthdays
-        .filter((b) => b.birthday === `${mm}-${dd}`)
-        .map((b) => b.nickname),
       events: store.remote.events.filter((e) => {
         const t = parseBJ(e.event_at);
         return !isNaN(t.getTime()) && dateStr === bjDateStr(t);
@@ -69,12 +65,6 @@ function bjDateStr(d: Date): string {
   const get = (t: string) => parts.find((p) => p.type === t)?.value ?? '';
   return `${get('year')}-${get('month')}-${get('day')}`;
 }
-
-// 今日生日（北京时间今天）
-const todayBirthdays = computed(() => {
-  const mmdd = `${String(today.value.month).padStart(2, '0')}-${String(today.value.day).padStart(2, '0')}`;
-  return store.remote.birthdays.filter((b) => b.birthday === mmdd);
-});
 
 // 近期活动（未结束，按时间升序，取前 5 个）
 const upcoming = computed(() =>
@@ -115,7 +105,7 @@ const weekDays = ['日', '一', '二', '三', '四', '五', '六'];
 <template>
   <div>
     <h1 class="page-title">日历</h1>
-    <p class="page-subtitle">活动安排与笨狐黧们的生日</p>
+    <p class="page-subtitle">活动安排一目了然</p>
 
     <div class="calendar-layout">
       <div class="card cal-card">
@@ -132,7 +122,6 @@ const weekDays = ['日', '一', '二', '三', '四', '五', '六'];
           <div v-for="(cell, i) in cells" :key="i" :class="['cal-cell', { empty: !cell, today: cell?.isToday }]">
             <template v-if="cell">
               <span class="cal-day">{{ cell.day }}</span>
-              <span v-for="n in cell.birthdays" :key="'b' + n" class="mark birthday" :title="n + ' 生日'">🎂{{ n }}</span>
               <span v-for="e in cell.events" :key="'e' + e.id" class="mark event" :title="e.title">📌{{ e.title }}</span>
             </template>
           </div>
@@ -140,12 +129,6 @@ const weekDays = ['日', '一', '二', '三', '四', '五', '六'];
       </div>
 
       <aside class="side">
-        <div class="card side-card">
-          <h3 class="side-title">🎂 今日生日</h3>
-          <p v-if="todayBirthdays.length === 0" class="side-empty">今天没有过生日的笨狐黧</p>
-          <p v-for="b in todayBirthdays" :key="b.id" class="side-item">{{ b.nickname }}，生日快乐！</p>
-        </div>
-
         <div v-if="nextEvent" class="card side-card countdown-card">
           <h3 class="side-title">⏳ 下一活动</h3>
           <p class="next-title">{{ nextEvent.title }}</p>
@@ -229,10 +212,6 @@ const weekDays = ['日', '一', '二', '三', '四', '五', '六'];
   border-radius: 6px;
   padding: 1px 4px;
 }
-.mark.birthday {
-  background: var(--pink-light);
-  color: var(--pink-deep);
-}
 .mark.event {
   background: var(--purple-light);
   color: #7a5aa8;
@@ -250,10 +229,6 @@ const weekDays = ['日', '一', '二', '三', '四', '五', '六'];
 .side-empty {
   color: var(--ink-light);
   font-size: 13px;
-}
-.side-item {
-  padding: 4px 0;
-  font-size: 14px;
 }
 .countdown-card {
   background: linear-gradient(140deg, #fff, var(--purple-light));

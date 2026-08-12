@@ -1,7 +1,8 @@
 {
   "site_name": "黧温婉粉丝站",
-  "logo": "",
-  "wallpaper": "",
+  "logo": "uploads/logo.png",
+  "wallpaper": "uploads/wallpaper.jpg",
+  "home_deco": "uploads/home-deco.png",
   "welcome_lines": [
     "欢迎来到黧温婉的小窝～",
     "这里是笨狐黧们的快乐基地",
@@ -13,8 +14,8 @@
   },
   "gift_notice": "舰礼为直播间上舰回馈，具体内容以主播直播间公告为准。",
   "contacts": [
-    { "type": "QQ群", "value": "123456789" },
-    { "type": "邮箱", "value": "liwenwan-fans@example.com" }
+    { "type": "QQ群", "value": "962145388" },
+    { "type": "邮箱", "value": "2848431674@qq.com" }
   ],
   "icp_no": ""
 }

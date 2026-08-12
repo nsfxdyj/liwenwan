@@ -18,8 +18,8 @@ npm run preview    # 预览构建产物
 ## 目录说明
 
 ```
-public/data/             站点内容 JSON（settings/news/gifts/songs/events/birthdays/videos/guard_honor）
-public/uploads/          管理员上传的图片
+public/data/             站点内容 JSON（settings/news/gifts/songs/events/videos/points）
+public/uploads/          管理员上传的图片（含站点素材 logo/wallpaper/home_deco/loading/bomb-explode）
 public/games/guaguale/   刮刮乐静态页（由 scripts/extract-guaguale.mjs 从单文件版抽离生成）
 src/config/admins.ts     写死的 3 个管理员账号（sha256(salt+password)）
 scripts/gen-admin-hash.mjs     生成管理员密码哈希
@@ -74,11 +74,11 @@ node scripts/gen-admin-hash.mjs "新密码"
 
 ### 备选：部署到国内 OSS（如阿里云 OSS / 腾讯云 COS）
 
-1. `npm run build` 得到 `dist/`。
-2. 全量上传，例如阿里云：`ossutil cp -r -f dist/ oss://你的bucket/`
-   （或腾讯云：`coscmd upload -r dist/ /`）。
-3. Bucket 开启静态网站托管，默认首页 `index.html`；路由为 hash 模式，无需配置错误页重定向。
-4. 境内部署需 ICP 备案，备案号填到后台「站点设置 → 备案号」，发布后页脚自动显示。
+1. 构建产物内资源引用带 `/liwenwan/` 前缀（vite base），二选一：
+   - 上传时保留前缀目录：`npm run build` 后 `ossutil cp -r -f dist/ oss://你的bucket/liwenwan/`，访问 `OSS域名/liwenwan/`；
+   - 或把 `vite.config.ts` 的 base 改回 `/` 后重新 `npm run build`，再全量上传到 bucket 根：`ossutil cp -r -f dist/ oss://你的bucket/`（或腾讯云：`coscmd upload -r dist/ /`）。
+2. Bucket 开启静态网站托管，默认首页 `index.html`；路由为 hash 模式，无需配置错误页重定向。
+3. 境内部署需 ICP 备案，备案号填到后台「站点设置 → 备案号」，发布后页脚自动显示。
 
 ## 安全边界说明（务必知悉）
 
@@ -88,7 +88,7 @@ node scripts/gen-admin-hash.mjs "新密码"
 因此：
 
 - 不要在后台或 JSON 内容中存放任何敏感信息（密码、密钥、隐私数据等），仓库与站点内容全部公开可见；
-- Token 按最小权限申请（仅本仓库 Contents 读写），泄露后立刻到 GitHub 吊销并重新生成；
+- Token 按最小权限申请（仅本仓库 Contents 读写 + Actions 只读），泄露后立刻到 GitHub 吊销并重新生成；
 - 管理员初始密码仅用于首次登录，请尽快修改。
 
 ## 其他约定

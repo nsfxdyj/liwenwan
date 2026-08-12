@@ -31,7 +31,7 @@ async function doLogin() {
 // ── 后台标签页 ──
 type TabKey =
   | 'dashboard' | 'settings' | 'news' | 'gifts' | 'songs'
-  | 'events' | 'birthdays' | 'videos' | 'honor' | 'publish';
+  | 'events' | 'videos' | 'points' | 'publish';
 
 const tabs: { key: TabKey; label: string }[] = [
   { key: 'dashboard', label: '仪表盘' },
@@ -40,9 +40,8 @@ const tabs: { key: TabKey; label: string }[] = [
   { key: 'gifts', label: '舰礼管理' },
   { key: 'songs', label: '歌单管理' },
   { key: 'events', label: '活动管理' },
-  { key: 'birthdays', label: '生日墙管理' },
   { key: 'videos', label: '视频管理' },
-  { key: 'honor', label: '感谢名单' },
+  { key: 'points', label: '积分管理' },
   { key: 'publish', label: '发布' },
 ];
 const activeTab = ref<TabKey>('dashboard');
@@ -75,11 +74,6 @@ const eventFields: Field[] = [
   { key: 'description', label: '说明', type: 'textarea', hideInTable: true },
 ];
 
-const birthdayFields: Field[] = [
-  { key: 'nickname', label: '昵称', type: 'text' },
-  { key: 'birthday', label: '生日（MM-DD）', type: 'text', placeholder: '如 08-12' },
-];
-
 const videoFields: Field[] = [
   { key: 'bvid', label: 'BV号', type: 'text', placeholder: '如 BV1xx411c7mD' },
   { key: 'title', label: '标题', type: 'text' },
@@ -89,11 +83,10 @@ const videoFields: Field[] = [
   { key: 'created_at', label: '添加时间', type: 'datetime' },
 ];
 
-const honorFields: Field[] = [
+const pointFields: Field[] = [
+  { key: 'uid', label: 'B站UID', type: 'text', placeholder: '纯数字 UID' },
   { key: 'nickname', label: '昵称', type: 'text' },
-  { key: 'level', label: '等级', type: 'select', options: ['总督', '提督', '舰长'], default: () => '舰长' },
-  { key: 'on_board', label: '是否在船', type: 'checkbox' },
-  { key: 'note', label: '备注', type: 'text' },
+  { key: 'points', label: '积分', type: 'number' },
 ];
 </script>
 
@@ -146,9 +139,8 @@ const honorFields: Field[] = [
       <CrudTable v-else-if="activeTab === 'gifts'" title="舰礼" data-key="gifts" :fields="giftFields" />
       <CrudTable v-else-if="activeTab === 'songs'" title="歌单" data-key="songs" :fields="songFields" batch-import />
       <CrudTable v-else-if="activeTab === 'events'" title="活动" data-key="events" :fields="eventFields" />
-      <CrudTable v-else-if="activeTab === 'birthdays'" title="生日墙" data-key="birthdays" :fields="birthdayFields" />
       <CrudTable v-else-if="activeTab === 'videos'" title="视频" data-key="videos" :fields="videoFields" />
-      <CrudTable v-else-if="activeTab === 'honor'" title="大航海感谢名单" data-key="guard_honor" :fields="honorFields" />
+      <CrudTable v-else-if="activeTab === 'points'" title="积分" data-key="points" :fields="pointFields" />
       <PublishTab v-else />
     </main>
   </div>

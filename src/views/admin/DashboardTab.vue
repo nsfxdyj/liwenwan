@@ -5,7 +5,7 @@ import { formatDateTimeBJ } from '../../utils/time';
 
 const store = useDataStore();
 
-const keys: DataKey[] = ['news', 'gifts', 'songs', 'events', 'birthdays', 'videos', 'guard_honor'];
+const keys: DataKey[] = ['news', 'gifts', 'songs', 'events', 'videos', 'points'];
 
 const counts = computed(() =>
   keys.map((k) => ({ key: k, label: dataLabel(k), count: ((store.draft[k] as unknown[]) ?? []).length })),
