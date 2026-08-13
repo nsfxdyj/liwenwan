@@ -56,15 +56,16 @@ function closePopup() {
   showPopup.value = false;
 }
 
+const navIconBase = `${import.meta.env.BASE_URL}uploads/nav`;
 const entries = [
-  { to: '/news', icon: '📰', label: '动态', desc: '主播最新公告' },
-  { to: '/gifts', icon: '🎁', label: '舰礼', desc: '每月上舰回馈' },
-  { to: '/songs', icon: '🎵', label: '歌单', desc: '点歌台开张啦' },
-  { to: '/calendar', icon: '📅', label: '日历', desc: '活动安排' },
-  { to: '/videos', icon: '🎬', label: '视频', desc: '精彩片段回顾' },
-  { to: '/points', icon: '🏆', label: '积分', desc: '笨狐黧积分榜' },
-  { to: '/games', icon: '🎮', label: '游戏', desc: '摸鱼小游戏' },
-  { to: '/about', icon: '💌', label: '关于', desc: '关于本站' },
+  { to: '/news', icon: `${navIconBase}/news.webp`, label: '动态', desc: '主播最新公告' },
+  { to: '/gifts', icon: `${navIconBase}/gifts.webp`, label: '舰礼', desc: '每月上舰回馈' },
+  { to: '/songs', icon: `${navIconBase}/songs.webp`, label: '歌单', desc: '点歌台开张啦' },
+  { to: '/calendar', icon: `${navIconBase}/calendar.webp`, label: '日历', desc: '活动安排' },
+  { to: '/videos', icon: `${navIconBase}/videos.webp`, label: '视频', desc: '精彩片段回顾' },
+  { to: '/points', icon: `${navIconBase}/points.webp`, label: '积分', desc: '笨狐黧积分榜' },
+  { to: '/games', icon: `${navIconBase}/games.webp`, label: '游戏', desc: '摸鱼小游戏' },
+  { to: '/about', icon: `${navIconBase}/about.webp`, label: '关于', desc: '关于本站' },
 ];
 </script>
 
@@ -82,7 +83,7 @@ const entries = [
 
     <section class="nav-grid">
       <router-link v-for="e in entries" :key="e.to" :to="e.to" class="nav-card card">
-        <span class="nav-icon">{{ e.icon }}</span>
+        <img class="nav-icon" :src="e.icon" :alt="e.label" loading="lazy" />
         <span class="nav-label">{{ e.label }}</span>
         <span class="nav-desc">{{ e.desc }}</span>
       </router-link>
@@ -156,7 +157,9 @@ const entries = [
   transform: translateY(-4px);
 }
 .nav-icon {
-  font-size: 34px;
+  width: 72px;
+  height: 72px;
+  object-fit: contain;
 }
 .nav-label {
   font-size: 17px;

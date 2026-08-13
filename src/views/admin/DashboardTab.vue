@@ -7,9 +7,11 @@ const store = useDataStore();
 
 const keys: DataKey[] = ['news', 'gifts', 'songs', 'events', 'videos', 'points'];
 
-const counts = computed(() =>
-  keys.map((k) => ({ key: k, label: dataLabel(k), count: ((store.draft[k] as unknown[]) ?? []).length })),
-);
+const counts = computed(() => {
+  const list = keys.map((k) => ({ key: k, label: dataLabel(k), count: ((store.draft[k] as unknown[]) ?? []).length }));
+  list.push({ key: 'monopoly' as DataKey, label: '大富翁格子数', count: store.draft.monopoly.cells?.length ?? 0 });
+  return list;
+});
 
 const dirtyLabels = computed(() => Array.from(store.dirty).map((k) => dataLabel(k)));
 

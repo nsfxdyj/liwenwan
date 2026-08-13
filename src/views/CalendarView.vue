@@ -131,18 +131,26 @@ const weekDays = ['日', '一', '二', '三', '四', '五', '六'];
       <aside class="side">
         <div v-if="nextEvent" class="card side-card countdown-card">
           <h3 class="side-title">⏳ 下一活动</h3>
-          <p class="next-title">{{ nextEvent.title }}</p>
-          <p class="next-time">{{ formatDateTimeBJ(nextEvent.event_at) }}</p>
-          <p class="countdown">{{ countdown }}</p>
+          <div class="event-body">
+            <img v-if="nextEvent.image" :src="nextEvent.image" :alt="nextEvent.title" class="event-thumb" />
+            <div class="event-text">
+              <p class="next-title">{{ nextEvent.title }}</p>
+              <p class="next-time">{{ formatDateTimeBJ(nextEvent.event_at) }}</p>
+              <p class="countdown">{{ countdown }}</p>
+            </div>
+          </div>
         </div>
 
         <div class="card side-card">
           <h3 class="side-title">📌 近期活动</h3>
           <p v-if="upcoming.length === 0" class="side-empty">近期暂无活动安排</p>
           <div v-for="e in upcoming" :key="e.id" class="event-item">
-            <p class="event-title">{{ e.title }}</p>
-            <p class="event-time">{{ formatDateTimeBJ(e.event_at) }}</p>
-            <p v-if="e.description" class="event-desc">{{ e.description }}</p>
+            <img v-if="e.image" :src="e.image" :alt="e.title" class="event-thumb" />
+            <div class="event-text">
+              <p class="event-title">{{ e.title }}</p>
+              <p class="event-time">{{ formatDateTimeBJ(e.event_at) }}</p>
+              <p v-if="e.description" class="event-desc">{{ e.description }}</p>
+            </div>
           </div>
         </div>
       </aside>
@@ -248,8 +256,27 @@ const weekDays = ['日', '一', '二', '三', '四', '五', '六'];
   color: var(--pink-deep);
 }
 .event-item {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
   padding: 8px 0;
   border-bottom: 1px dashed var(--pink-light);
+}
+.event-body {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+}
+.event-thumb {
+  width: 64px;
+  height: 64px;
+  object-fit: cover;
+  border-radius: 10px;
+  flex-shrink: 0;
+}
+.event-text {
+  flex: 1;
+  min-width: 0;
 }
 .event-item:last-child {
   border-bottom: none;

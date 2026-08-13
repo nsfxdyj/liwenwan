@@ -25,9 +25,12 @@ export interface Settings {
 export interface NewsItem { id: string; title: string; content: string; created_at: string; updated_at: string }
 export interface GiftItem { id: string; title: string; image: string; description: string; month: string; status: 'on' | 'off'; sort: number }
 export interface SongItem { id: string; name: string; artist: string; note: string }
-export interface EventItem { id: string; title: string; event_at: string; description: string }
+export interface EventItem { id: string; title: string; event_at: string; description: string; image: string }
 export interface VideoItem { id: string; bvid: string; title: string; cover: string; description: string; category: string; created_at: string }
 export interface PointItem { id: string; uid: string; nickname: string; points: number }
+export interface MonopolyCell { id: string; label: string; image: string }
+export interface MonopolyCharacter { id: string; name: string; image: string }
+export interface MonopolyData { rules: string; cells: MonopolyCell[]; characters: MonopolyCharacter[] }
 
 export const DATA_FILES = [
   'settings',
@@ -37,6 +40,7 @@ export const DATA_FILES = [
   'events',
   'videos',
   'points',
+  'monopoly',
 ] as const;
 
 export type DataKey = (typeof DATA_FILES)[number];
@@ -49,6 +53,7 @@ const DATA_LABELS: Record<DataKey, string> = {
   events: '活动',
   videos: '视频',
   points: '积分',
+  monopoly: '大富翁',
 };
 
 export function dataLabel(key: DataKey): string {
@@ -75,6 +80,7 @@ type DraftState = {
   events: EventItem[];
   videos: VideoItem[];
   points: PointItem[];
+  monopoly: MonopolyData;
 };
 
 function emptyDraft(): DraftState {
@@ -86,6 +92,7 @@ function emptyDraft(): DraftState {
     events: [],
     videos: [],
     points: [],
+    monopoly: { rules: '', cells: [], characters: [] },
   };
 }
 
@@ -124,6 +131,8 @@ export const useDataStore = defineStore('data', {
         const data = emptyDraft();
         for (const [key, value] of entries) {
           if (key === 'settings') data.settings = { ...DEFAULT_SETTINGS, ...(value as object) };
+          else if (key === 'monopoly')
+            data.monopoly = { rules: '', cells: [], characters: [], ...(value as object) };
           else (data as Record<string, unknown>)[key] = value;
         }
         this.remote = data;

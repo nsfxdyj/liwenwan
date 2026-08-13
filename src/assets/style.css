@@ -139,7 +139,8 @@ select:focus {
 
 .page-subtitle {
   text-align: center;
-  color: var(--ink-light);
+  color: var(--ink);
+  text-shadow: 0 1px 3px rgba(255, 255, 255, 0.9);
   margin-bottom: 22px;
   font-size: 15px;
 }

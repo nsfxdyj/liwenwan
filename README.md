@@ -18,7 +18,7 @@ npm run preview    # 预览构建产物
 ## 目录说明
 
 ```
-public/data/             站点内容 JSON（settings/news/gifts/songs/events/videos/points）
+public/data/             站点内容 JSON（settings/news/gifts/songs/events/videos/points/monopoly）
 public/uploads/          管理员上传的图片（含站点素材 logo/wallpaper/home_deco/loading/bomb-explode）
 public/games/guaguale/   刮刮乐静态页（由 scripts/extract-guaguale.mjs 从单文件版抽离生成）
 src/config/admins.ts     写死的 3 个管理员账号（sha256(salt+password)）

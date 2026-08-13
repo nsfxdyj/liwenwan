@@ -29,7 +29,8 @@ const contacts = computed(() => store.remote.settings.contacts ?? []);
 .site-footer {
   text-align: center;
   padding: 26px 16px 34px;
-  color: var(--ink-light);
+  color: var(--ink);
+  text-shadow: 0 1px 3px rgba(255, 255, 255, 0.9);
   font-size: 13px;
 }
 .copyright {

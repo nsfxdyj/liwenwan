@@ -6,6 +6,7 @@ import CrudTable, { type Field } from '../components/admin/CrudTable.vue';
 import DashboardTab from './admin/DashboardTab.vue';
 import SettingsTab from './admin/SettingsTab.vue';
 import PublishTab from './admin/PublishTab.vue';
+import MonopolyTab from './admin/MonopolyTab.vue';
 
 const auth = useAuthStore();
 const router = useRouter();
@@ -31,7 +32,7 @@ async function doLogin() {
 // ── 后台标签页 ──
 type TabKey =
   | 'dashboard' | 'settings' | 'news' | 'gifts' | 'songs'
-  | 'events' | 'videos' | 'points' | 'publish';
+  | 'events' | 'videos' | 'points' | 'monopoly' | 'publish';
 
 const tabs: { key: TabKey; label: string }[] = [
   { key: 'dashboard', label: '仪表盘' },
@@ -42,6 +43,7 @@ const tabs: { key: TabKey; label: string }[] = [
   { key: 'events', label: '活动管理' },
   { key: 'videos', label: '视频管理' },
   { key: 'points', label: '积分管理' },
+  { key: 'monopoly', label: '大富翁设置' },
   { key: 'publish', label: '发布' },
 ];
 const activeTab = ref<TabKey>('dashboard');
@@ -72,6 +74,7 @@ const eventFields: Field[] = [
   { key: 'title', label: '活动名', type: 'text' },
   { key: 'event_at', label: '时间', type: 'datetime', placeholder: 'YYYY-MM-DD HH:mm:ss' },
   { key: 'description', label: '说明', type: 'textarea', hideInTable: true },
+  { key: 'image', label: '活动图（可选）', type: 'image', hideInTable: true },
 ];
 
 const videoFields: Field[] = [
@@ -141,6 +144,7 @@ const pointFields: Field[] = [
       <CrudTable v-else-if="activeTab === 'events'" title="活动" data-key="events" :fields="eventFields" />
       <CrudTable v-else-if="activeTab === 'videos'" title="视频" data-key="videos" :fields="videoFields" />
       <CrudTable v-else-if="activeTab === 'points'" title="积分" data-key="points" :fields="pointFields" />
+      <MonopolyTab v-else-if="activeTab === 'monopoly'" />
       <PublishTab v-else />
     </main>
   </div>

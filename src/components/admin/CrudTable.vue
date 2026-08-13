@@ -218,6 +218,9 @@ function cellText(item: any, f: Field): string {
           <img v-if="editing[f.key]" :src="editing[f.key]" class="preview" alt="预览" />
           <input type="file" accept="image/jpeg,image/png,image/webp" @change="onPickImage(f, $event)" />
           <p class="hint">jpg/png/webp，自动压缩至 {{ Math.round((f.imageMax ?? 307200) / 1024) }}KB 内</p>
+          <p v-if="editing[f.key]" class="hint">
+            <a href="javascript:;" @click="editing[f.key] = ''">移除图片</a>
+          </p>
           <p v-if="uploadError" class="error">{{ uploadError }}</p>
         </div>
         <input v-else type="text" v-model="editing[f.key]" :placeholder="f.placeholder" :maxlength="f.maxlength" />

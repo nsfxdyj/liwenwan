@@ -3,24 +3,21 @@
     "id": "e1",
     "title": "七夕特别直播",
     "event_at": "2026-08-29 20:00:00",
-    "description": "七夕主题歌回，来点甜甜的歌！"
+    "description": "七夕主题歌回，来点甜甜的歌！",
+    "image": ""
   },
   {
     "id": "e2",
     "title": "满月纪念回",
     "event_at": "2026-09-01 20:00:00",
-    "description": "直播满月纪念，感谢笨狐黧们一个月的陪伴。"
+    "description": "直播满月纪念，感谢笨狐黧们一个月的陪伴。",
+    "image": ""
   },
   {
     "id": "e3",
     "title": "生日倒计时小聚",
     "event_at": "2026-08-15 21:00:00",
-    "description": "给本月过生日的笨狐黧们庆生。"
-  },
-  {
-    "id": "e4",
-    "title": "复播纪念",
-    "event_at": "2026-11-01 20:00:00",
-    "description": "黧温婉复播纪念日，感谢笨狐黧们的等待与陪伴。"
+    "description": "给本月过生日的笨狐黧们庆生。",
+    "image": "uploads/event-birthday.jpg"
   }
 ]

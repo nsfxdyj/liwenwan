@@ -1,0 +1,38 @@
+{
+  "rules": "心动盲盒x1 掷一次筛子",
+  "cells": [
+    { "id": "c1", "label": "起点", "image": "" },
+    { "id": "c2", "label": "踩空啦", "image": "" },
+    { "id": "c3", "label": "送花束一个", "image": "" },
+    { "id": "c4", "label": "说出桃两个优点", "image": "" },
+    { "id": "c5", "label": "每句话后加喵两分钟", "image": "" },
+    { "id": "c6", "label": "桃桃学小狗叫1分钟", "image": "" },
+    { "id": "c7", "label": "禁言一分钟", "image": "" },
+    { "id": "c8", "label": "学喵一首歌", "image": "" },
+    { "id": "c9", "label": "真心话", "image": "" },
+    { "id": "c10", "label": "桃桃撒娇八连", "image": "" },
+    { "id": "c11", "label": "亲亲×20", "image": "" },
+    { "id": "c12", "label": "桃桃指压板一分钟", "image": "" },
+    { "id": "c13", "label": "送桃桃520张人气票", "image": "" },
+    { "id": "c14", "label": "直接到终点", "image": "" },
+    { "id": "c15", "label": "后退两步", "image": "" },
+    { "id": "c16", "label": "奶茶一杯", "image": "" },
+    { "id": "c17", "label": "桃桃叫主人三声", "image": "" },
+    { "id": "c18", "label": "一分钟的弹幕都说对", "image": "" },
+    { "id": "c19", "label": "叫醒服务一次", "image": "" },
+    { "id": "c20", "label": "鼠标垫", "image": "" },
+    { "id": "c21", "label": "给桃桃告白三句", "image": "" },
+    { "id": "c22", "label": "桃桃大喊五声八嘎", "image": "" },
+    { "id": "c23", "label": "KFC", "image": "" },
+    { "id": "c24", "label": "舰长改名桃桃の**", "image": "" },
+    { "id": "c25", "label": "奶茶红包", "image": "" },
+    { "id": "c26", "label": "发动态艾特桃说单推桃", "image": "" },
+    { "id": "c27", "label": "唱桃桃是垫的", "image": "" },
+    { "id": "c28", "label": "终点", "image": "" }
+  ],
+  "characters": [
+    { "id": "foxgirl", "name": "小温婉", "image": "uploads/monopoly/char-foxgirl.webp" },
+    { "id": "foxhead", "name": "狐狐头", "image": "uploads/monopoly/char-foxhead.webp" },
+    { "id": "paw", "name": "狐爪", "image": "uploads/monopoly/char-paw.webp" }
+  ]
+}

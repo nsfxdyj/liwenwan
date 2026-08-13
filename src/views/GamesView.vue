@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { computed, onUnmounted, ref } from 'vue';
+import MonopolyGame from '../components/MonopolyGame.vue';
 
-type GameKey = 'bomb' | 'dice' | 'guaguale';
+type GameKey = 'bomb' | 'dice' | 'guaguale' | 'monopoly';
 const active = ref<GameKey>('bomb');
 
 /* ── 数字炸弹（10×10 格子矩阵，点击格子猜数） ── */
@@ -95,11 +96,12 @@ const guagualeUrl = `${import.meta.env.BASE_URL}games/guaguale/index.html`;
 <template>
   <div>
     <h1 class="page-title">摸鱼小游戏</h1>
-    <p class="page-subtitle">三个小游戏，数据都只存在你自己的浏览器里</p>
+    <p class="page-subtitle">摸鱼小游戏合集，数据都只存在你自己的浏览器里</p>
 
     <div class="game-entries">
       <button :class="{ plain: active !== 'bomb' }" @click="active = 'bomb'">💣 数字炸弹</button>
       <button :class="{ plain: active !== 'dice' }" @click="active = 'dice'">🎲 掷骰子</button>
+      <button :class="{ plain: active !== 'monopoly' }" @click="active = 'monopoly'">🏠 大富翁</button>
       <button :class="{ plain: active !== 'guaguale' }" @click="active = 'guaguale'">🎫 刮刮乐</button>
     </div>
 
@@ -146,6 +148,11 @@ const guagualeUrl = `${import.meta.env.BASE_URL}games/guaguale/index.html`;
       <div class="btn-row" style="justify-content: center">
         <button :disabled="rolling" @click="rollDice">{{ rolling ? '摇动中…' : '掷！' }}</button>
       </div>
+    </div>
+
+    <div v-else-if="active === 'monopoly'" class="card game-card monopoly-card">
+      <h3 class="game-title">🏠 大富翁跳格子</h3>
+      <MonopolyGame />
     </div>
 
     <div v-else class="card game-card guaguale-card">
@@ -285,6 +292,9 @@ const guagualeUrl = `${import.meta.env.BASE_URL}games/guaguale/index.html`;
   animation: shake 0.08s linear infinite;
 }
 .guaguale-card {
+  max-width: 860px;
+}
+.monopoly-card {
   max-width: 860px;
 }
 .guaguale-frame {
