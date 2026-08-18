@@ -1,4 +1,4 @@
-// 写死的 3 个管理员账号（规格书 §五.1）
+// 写死的管理员账号（规格书 §五.1）
 // hash = sha256(ADMIN_SALT + 密码)
 // 初始密码随部署文档单独交付（见仓库外的「初始管理员密码-勿入库.txt」），不写入本仓库任何文件。
 // 生成方式：node scripts/gen-admin-hash.mjs <密码>
@@ -15,4 +15,5 @@ export const ADMINS: AdminAccount[] = [
   { username: 'admin1', hash: '62ecaf7577cc4ebd7d4e4aa0b84801549e884c29e6afce64910158925f5650ef' },
   { username: 'admin2', hash: '62ecaf7577cc4ebd7d4e4aa0b84801549e884c29e6afce64910158925f5650ef' },
   { username: 'admin3', hash: '62ecaf7577cc4ebd7d4e4aa0b84801549e884c29e6afce64910158925f5650ef' },
+  { username: 'lww2003', hash: '94a2191762b1e1beb751b030cb94f63b373429633dd77200e318a7524b8a5147' },
 ];
