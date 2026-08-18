@@ -160,6 +160,7 @@ const entries = [
   width: 72px;
   height: 72px;
   object-fit: contain;
+  border-radius: 14px;
 }
 .nav-label {
   font-size: 17px;
