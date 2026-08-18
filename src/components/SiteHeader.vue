@@ -1,5 +1,9 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
+import { useDataStore } from '../stores/data';
+
+const store = useDataStore();
+const logo = computed(() => store.remote.settings.logo);
 
 const menuOpen = ref(false);
 
@@ -18,6 +22,9 @@ const navs = [
 
 <template>
   <header class="site-header">
+    <router-link to="/" class="brand" aria-label="回到主页">
+      <img v-if="logo" :src="logo" alt="黧温婉" class="brand-logo" />
+    </router-link>
     <button class="menu-toggle plain" @click="menuOpen = !menuOpen">菜单</button>
     <nav :class="['site-nav', { open: menuOpen }]">
       <router-link
@@ -46,6 +53,19 @@ const navs = [
   background: rgba(255, 255, 255, 0.82);
   backdrop-filter: blur(8px);
   box-shadow: 0 2px 12px rgba(240, 98, 146, 0.12);
+}
+.brand {
+  position: absolute;
+  left: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+}
+.brand-logo {
+  height: 36px;
+  width: auto;
+  display: block;
 }
 .site-nav {
   display: flex;

@@ -20,7 +20,7 @@ const filtered = computed(() => {
 <template>
   <div>
     <h1 class="page-title">黧温婉の点歌台</h1>
-    <p class="page-subtitle">欢迎直播间点播，慎点，小心耳朵！心动盲点一首</p>
+    <p class="page-subtitle">欢迎直播间点播，慎点，小心耳朵！心动盲盒点歌一首</p>
 
     <div class="card">
       <input v-model="keyword" class="search" placeholder="搜索歌名 / 歌手 / 备注…" />
