@@ -5,8 +5,8 @@ import { useDataStore } from '../stores/data';
 const store = useDataStore();
 
 type SortKey = 'uid' | 'nickname' | 'points';
-const sortKey = ref<SortKey>('points');
-const sortAsc = ref(false); // 默认按积分降序
+const sortKey = ref<SortKey>('uid');
+const sortAsc = ref(true); // 默认按 UID 升序
 
 const sorted = computed(() => {
   const list = [...store.remote.points];

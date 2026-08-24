@@ -8,6 +8,25 @@ const board = computed(() => store.remote.monopoly);
 const cells = computed<MonopolyCell[]>(() => board.value.cells ?? []);
 const characters = computed(() => board.value.characters ?? []);
 
+/* ── 棋盘配色：普通格子按索引循环，起点/终点固定色 ── */
+const NORMAL_COLORS = [
+  'rgba(255, 183, 178, 0.55)',
+  'rgba(181, 234, 215, 0.55)',
+  'rgba(199, 206, 234, 0.55)',
+  'rgba(255, 223, 186, 0.55)',
+  'rgba(226, 240, 203, 0.55)',
+  'rgba(250, 227, 209, 0.55)',
+];
+const START_COLOR = 'rgba(255, 215, 0, 0.55)';
+const END_COLOR = 'rgba(240, 98, 146, 0.55)';
+
+function cellColor(index: number): string {
+  const total = cells.value.length;
+  if (index === 0) return START_COLOR;
+  if (total > 1 && index === total - 1) return END_COLOR;
+  return NORMAL_COLORS[index % NORMAL_COLORS.length];
+}
+
 /* ── 进度持久化：每个角色独立 {charId: {cell, lap}} ── */
 const STORAGE_KEY = 'lww_monopoly_v1';
 
@@ -146,7 +165,11 @@ onUnmounted(() => {
         v-for="(cell, i) in cells"
         :key="cell.id"
         :class="['m-cell', { current: i === pos }]"
-        :style="{ gridRow: geom.positions[i].row, gridColumn: geom.positions[i].col }"
+        :style="{
+          gridRow: geom.positions[i].row,
+          gridColumn: geom.positions[i].col,
+          backgroundColor: cellColor(i),
+        }"
       >
         <img v-if="cell.image" :src="cell.image" :alt="cell.label" class="m-cell-img" />
         <span class="m-cell-label">{{ cell.label }}</span>
@@ -249,7 +272,7 @@ onUnmounted(() => {
 }
 .m-cell.current {
   outline: 2px solid var(--pink);
-  background: #fff0f6;
+  box-shadow: inset 0 0 0 3px rgba(255, 255, 255, 0.6);
 }
 .m-cell-img {
   width: 60%;
