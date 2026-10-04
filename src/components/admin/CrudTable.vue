@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, reactive, ref } from 'vue';
+import { computed, reactive, ref, watch } from 'vue';
 import { useDataStore, type DataKey } from '../../stores/data';
 import { compressImage } from '../../utils/image';
 import { parseBJ } from '../../utils/time';
@@ -22,6 +22,8 @@ const props = defineProps<{
   dataKey: DataKey;
   fields: Field[];
   batchImport?: boolean; // 歌单批量粘贴导入
+  searchable?: boolean; // 显示搜索框（按表格列过滤）
+  reorderable?: boolean; // 显示上移/下移，调整条目顺序
 }>();
 
 const store = useDataStore();
@@ -180,13 +182,54 @@ function cellText(item: any, f: Field): string {
   if (f.key === 'status') return v === 'on' ? '上架中' : '已下架';
   return String(v ?? '');
 }
+
+/* ── 搜索与分页：只影响显示，不改数据本身 ── */
+const keyword = ref('');
+const PAGE_SIZE = 100; // 超过 100 条自动分页，避免一次渲染过多行
+
+const filtered = computed<any[]>(() => {
+  const kw = keyword.value.trim().toLowerCase();
+  if (!kw) return items.value;
+  return items.value.filter((item) =>
+    tableFields.value.some((f) => cellText(item, f).toLowerCase().includes(kw)),
+  );
+});
+
+const page = ref(1);
+const pageCount = computed(() => Math.max(1, Math.ceil(filtered.value.length / PAGE_SIZE)));
+const pageItems = computed<any[]>(() => {
+  const start = (page.value - 1) * PAGE_SIZE;
+  return filtered.value.slice(start, start + PAGE_SIZE);
+});
+
+watch(keyword, () => { page.value = 1; });
+watch(pageCount, (n) => { if (page.value > n) page.value = n; });
+
+/* ── 调整条目顺序（对原列表整体生效） ── */
+function move(item: any, dir: -1 | 1) {
+  const list = [...items.value];
+  const i = list.findIndex((x) => x.id === item.id);
+  const j = i + dir;
+  if (i < 0 || j < 0 || j >= list.length) return;
+  [list[i], list[j]] = [list[j], list[i]];
+  (store.updateDraft as any)(props.dataKey, list);
+}
 </script>
 
 <template>
   <div class="card crud">
     <div class="crud-head">
-      <h3 class="crud-title">{{ title }}（{{ items.length }} 条）</h3>
+      <h3 class="crud-title">
+        {{ title }}（{{ items.length }} 条<template v-if="keyword.trim()">，匹配 {{ filtered.length }} 条</template>）
+      </h3>
       <div class="btn-row">
+        <input
+          v-if="searchable"
+          v-model="keyword"
+          class="search-input"
+          type="search"
+          placeholder="搜索…"
+        />
         <button v-if="batchImport" class="plain" @click="showBatch = !showBatch">批量导入</button>
         <button @click="startAdd">+ 新增</button>
       </div>
@@ -241,9 +284,21 @@ function cellText(item: any, f: Field): string {
           </tr>
         </thead>
         <tbody>
-          <tr v-for="item in items" :key="item.id">
+          <tr v-for="item in pageItems" :key="item.id">
             <td v-for="f in tableFields" :key="f.key" class="cell">{{ cellText(item, f) }}</td>
             <td class="ops">
+              <template v-if="reorderable">
+                <button
+                  class="plain"
+                  :disabled="items.indexOf(item) === 0"
+                  @click="move(item, -1)"
+                >上移</button>
+                <button
+                  class="plain"
+                  :disabled="items.indexOf(item) === items.length - 1"
+                  @click="move(item, 1)"
+                >下移</button>
+              </template>
               <button v-if="dataKey === 'gifts'" class="plain" @click="toggle(item, 'status')">
                 {{ item.status === 'on' ? '下架' : '上架' }}
               </button>
@@ -251,11 +306,19 @@ function cellText(item: any, f: Field): string {
               <button class="danger" @click="remove(item)">删除</button>
             </td>
           </tr>
-          <tr v-if="items.length === 0">
-            <td :colspan="tableFields.length + 1" class="empty">暂无数据</td>
+          <tr v-if="pageItems.length === 0">
+            <td :colspan="tableFields.length + 1" class="empty">
+              {{ keyword.trim() ? '没有匹配的条目' : '暂无数据' }}
+            </td>
           </tr>
         </tbody>
       </table>
+    </div>
+
+    <div v-if="pageCount > 1" class="pager">
+      <button class="plain" :disabled="page <= 1" @click="page--">上一页</button>
+      <span class="hint">第 {{ page }} / {{ pageCount }} 页 · 共 {{ filtered.length }} 条</span>
+      <button class="plain" :disabled="page >= pageCount" @click="page++">下一页</button>
     </div>
   </div>
 </template>
@@ -308,6 +371,16 @@ function cellText(item: any, f: Field): string {
   border-radius: 10px;
   display: block;
   margin-bottom: 8px;
+}
+.search-input {
+  width: 220px;
+}
+.pager {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 12px;
 }
 .cell {
   max-width: 240px;

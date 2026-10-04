@@ -140,7 +140,7 @@ const pointFields: Field[] = [
       <SettingsTab v-else-if="activeTab === 'settings'" />
       <CrudTable v-else-if="activeTab === 'news'" title="动态" data-key="news" :fields="newsFields" />
       <CrudTable v-else-if="activeTab === 'gifts'" title="舰礼" data-key="gifts" :fields="giftFields" />
-      <CrudTable v-else-if="activeTab === 'songs'" title="歌单" data-key="songs" :fields="songFields" batch-import />
+      <CrudTable v-else-if="activeTab === 'songs'" title="歌单" data-key="songs" :fields="songFields" batch-import searchable reorderable />
       <CrudTable v-else-if="activeTab === 'events'" title="活动" data-key="events" :fields="eventFields" />
       <CrudTable v-else-if="activeTab === 'videos'" title="视频" data-key="videos" :fields="videoFields" />
       <CrudTable v-else-if="activeTab === 'points'" title="积分" data-key="points" :fields="pointFields" />
